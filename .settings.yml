@@ -1,0 +1,177 @@
+tool versions:
+  waf: 02
+  wscript: 03
+  python27: 00
+  waf_compilers: 99
+  #mingw: 00
+  eut: 99
+  excelgen: 99
+  # code_metrics: 00
+  fsmgen: 99
+  #pclint: 00
+  console_log: 99
+  arduino: 00
+  
+options:
+- !options &avr_atmega2560_options
+  cflags:
+  - -c
+  - -g
+  - -Os
+  - -w
+  - -std=gnu11
+  - -ffunction-sections
+  - -fdata-sections
+  - -MMD
+  - -mmcu=atmega2560
+  cxxflags:
+  - -c
+  - -g
+  - -Os
+  - -w
+  - -std=gnu++11
+  - -fno-exceptions
+  - -ffunction-sections
+  - -fdata-sections
+  - -fno-threadsafe-statics
+  - -MMD
+  - -mmcu=atmega2560
+  defines:
+  - F_CPU=16000000L
+  - ARDUINO=10606
+  - ARDUINO_AVR_MEGA2560
+  - ARDUINO_ARCH_AVR 
+  asflags:
+  - -c
+  - -g
+  - -x
+  - assembler-with-cpp
+  - -mmcu=atmega2560
+  linkflags:
+  - -w
+  - -Os
+  #- '-Wl--gc-sections,--relax'
+  - -mmcu=atmega2560
+  - -lm     
+  
+variants:
+- !variant
+  name: app
+  tools:
+  - console_log
+  - avrdude
+  - avr-gcc
+  - avr-gxx
+  - fsmgen
+  use:
+  - !task_gen
+    target: firmware
+    type: program
+    options: *avr_atmega2560_options
+    features:
+    - c
+    - cxx
+    - cprogram
+    - avr-gcc
+    - fsmgen
+    content:
+    - ARD_AVR_CORE
+    - ARD_AVR_VARIANT_MEGA
+    - EEPROMEx
+    - APP
+    
+  - !task_gen
+    target: firmware1
+    type: program
+    options: *avr_atmega2560_options
+    features:
+    - c
+    - cxx
+    - cprogram
+    - avr-gcc
+    - fsmgen
+    content:
+    - ARD_AVR_CORE
+    - ARD_AVR_VARIANT_MEGA
+    - EEPROMEx
+    - APP
+    
+  - !task_gen
+    target: firmware2
+    type: program
+    options: *avr_atmega2560_options
+    features:
+    - c
+    - cxx
+    - cprogram
+    - avr-gcc
+    - fsmgen
+    content:
+    - ARD_AVR_CORE
+    - ARD_AVR_VARIANT_MEGA
+    - EEPROMEx
+    - APP
+  
+units:  
+- !unit
+  name: ARD_AVR_CORE
+  source:
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\WInterrupts.c
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\hooks.c
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\wiring.c
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\wiring_analog.c
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\wiring_digital.c
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\wiring_pulse.c
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\wiring_shift.c
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\CDC.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\HardwareSerial.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\HardwareSerial0.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\HardwareSerial1.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\HardwareSerial2.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\HardwareSerial3.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\IPAddress.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\PluggableUSB.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\Print.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\Stream.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\Tone.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\USBCore.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\WMath.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\WString.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\abi.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\main.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\new.cpp
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino\wiring_pulse.S
+  includes:
+  - __tools__\arduino\hardware\arduino\avr\cores\arduino
+
+- !unit
+  name: ARD_AVR_VARIANT_MEGA
+  includes:
+  - __tools__\arduino\hardware\arduino\avr\variants\mega
+  # - __tools__\arduino\hardware\arduino\avr\variants\standard
+
+- !unit
+  name: APP
+  source:
+  - src\app.cpp
+  - src\waiting.cpp
+  includes:
+  - src
+  fsmgen:
+  - !fsmgen
+    xmi: src\glue_system.xml
+    prefix: App
+    includes:
+    - arduino.h
+    - app.h
+    - waiting.h
+    instances: []
+
+- !unit
+  name: EEPROMEx
+  source:
+  - EEPROMEx\EEPROMex.cpp
+  includes:
+  - EEPROMEx
+  
+  
